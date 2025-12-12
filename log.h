@@ -16,12 +16,14 @@
 typedef enum {
     NONE,
     INFO,
+    DEBUG,
     WARNING,
-    ERROR
+    ERROR,
+    ALL
 } LogLevel;
 
 void init_logg(FILE* file, int rc, LogLevel max_lvl);
-void logg(LogLevel level, char *msg);
+void logg(LogLevel level, char *msg, ...);
 
 #ifdef LOG_IMPL
 #include <assert.h>
@@ -36,10 +38,9 @@ void init_logg(FILE *f, int rc, LogLevel max_lvl) {
     max_level = max_lvl;
 }
 
-void logg(LogLevel level, char* msg) {
+void logg(LogLevel level, char* msg, ...) {
     assert(file != NULL);
 
-    
     if (level > max_level) return;
     
     char* colour;
@@ -50,6 +51,10 @@ void logg(LogLevel level, char* msg) {
         colour = BLU;
         prefix = "INFO";
         break;
+    case DEBUG:
+        colour = GRN;
+        prefix = "DEBUG";
+        break;
     case WARNING:
         colour = YEL;
         prefix = "WARNING";
@@ -58,14 +63,22 @@ void logg(LogLevel level, char* msg) {
         colour = RED;
         prefix = "ERROR";
         break;
-    default:
-        printf("default case\n");
+    case NONE:
+    case ALL:
+        fprintf(stderr, "You should not use NONE or ALL when calling logg function!\n");
+        exit(1);
     }
 
     if (!render_colours)
         colour = CRESET;
-    
-    fprintf(file, "%s[ %7s ]%s %s\n", colour, prefix, CRESET, msg);
+
+    char msg_buf[64];
+
+    va_list args;
+    va_start(args, msg);
+    vsprintf(msg_buf, msg, args);
+    fprintf(file, "%s[ %7s ]%s %s\n", colour, prefix, CRESET, msg_buf);
+    va_end(args);
 }
 
 #endif
