@@ -25,7 +25,6 @@ void logg(LogLevel level, char *msg);
 
 #ifdef LOG_IMPL
 #include <assert.h>
-#include "ansi_colours.h"
 
 static FILE *file;
 static int render_colours = 0;
@@ -40,6 +39,7 @@ void init_logg(FILE *f, int rc, LogLevel max_lvl) {
 void logg(LogLevel level, char* msg) {
     assert(file != NULL);
 
+    
     if (level > max_level) return;
     
     char* colour;
