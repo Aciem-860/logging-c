@@ -44,6 +44,7 @@ void logg(LogLevel level, char* msg, ...) {
     if (level > max_level) return;
     
     char* colour;
+    char* colour_reset;
     char* prefix;
 
     switch(level) {
@@ -69,15 +70,19 @@ void logg(LogLevel level, char* msg, ...) {
         exit(1);
     }
 
-    if (!render_colours)
-        colour = CRESET;
+    if (!render_colours) {
+        colour = "";
+        colour_reset = "";
+    } else {
+        colour_reset = CRESET;
+    }
 
     char msg_buf[64];
 
     va_list args;
     va_start(args, msg);
     vsprintf(msg_buf, msg, args);
-    fprintf(file, "%s[ %7s ]%s %s\n", colour, prefix, CRESET, msg_buf);
+    fprintf(file, "%s[ %7s ]%s %s\n", colour, prefix, colour_reset, msg_buf);
     va_end(args);
 }
 
